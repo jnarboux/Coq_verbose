@@ -1,3 +1,7 @@
+(* Coq verbose                       *)
+(* Some tactics to teach using Coq.  *)
+(* This is inspired by Lean verbose. *)
+
 Require Import Classical.
 
 Lemma contrapose_prop: forall P Q:Prop, (~ Q -> ~P) -> P -> Q.
@@ -6,7 +10,10 @@ intros.
 apply NNPP;tauto.
 Qed.
 
-(* Coq verbose *)
+Ltac hyp_of_type t :=
+ match goal with
+| H1:t |- _ => H1
+  end.
 
 Ltac check_hyp_is h stmt :=
  let Hf:=fresh in 
@@ -73,6 +80,10 @@ Tactic Notation "By" constr(H) "it" "suffices" "to" "prove" "that" constr(stmt) 
 
 Tactic Notation "By" constr(H) "it" "suffices" "to" "prove" "that" constr(stmt1) "and" constr(stmt2) := 
  apply H;[letsprove_tac stmt1|letsprove_tac stmt2].
+
+
+Tactic Notation "By" "cases" "on" constr(t) :=
+(let H := hyp_of_type t in elim H).
 
 
 Example test1 : forall n:nat, n>0 -> True.
@@ -167,4 +178,20 @@ assumption.
 Let's prove that P2.
 assumption.
 Qed.
+
+Example test_by_cases_1 : forall P Q : Prop, P \/ Q -> Q \/ P.
+Proof.
+Fix P.
+Fix Q.
+Assume H: (P \/ Q).
+By cases on (P \/ Q).
+- Assume HP : P.
+  Let's prove that P.
+  assumption.
+- Assume HQ: Q.
+  Let's prove that Q.
+  assumption.
+Qed.
+
+
 
